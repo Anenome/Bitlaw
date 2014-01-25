@@ -2,9 +2,9 @@
 # Copyright (c) 2014 Johan Burke
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
-import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from .laweditor import *
 
 class BitlawMainForm(QMainWindow):
     def createAction(self, text, slot=None, shortcut=None, checkable=False, signal="triggered()"):
@@ -22,7 +22,7 @@ class BitlawMainForm(QMainWindow):
         self.fileMenu.addAction(fileQuitAction)
     
     def init_editor(self):
-        self.lawEditor = QWidget(self)
+        self.lawEditor = LawEditor(self)
         self.tabs.addTab(self.lawEditor, "Create new law")
         
     def init_adopted_laws(self):
@@ -53,10 +53,3 @@ class BitlawMainForm(QMainWindow):
         self.setMinimumSize(640, 480)
         self.init_menus()
         self.init_tabs()
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setApplicationName("Bitlaw")
-    form = BitlawMainForm()
-    form.show()
-    app.exec_()
