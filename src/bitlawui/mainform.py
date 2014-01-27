@@ -4,9 +4,14 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from .laweditor import *
+from .mylawtab import *
+from .newlaw import *
 
 class BitlawMainForm(QMainWindow):
+    def newLaw(self):
+        newLawWindow = NewLawEditor("", self)
+        newLawWindow.show()
+
     def createAction(self, text, slot=None, shortcut=None, checkable=False, signal="triggered()"):
         action = QAction(text, self)
         if shortcut is not None:
@@ -18,12 +23,14 @@ class BitlawMainForm(QMainWindow):
     
     def init_file_menu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
+        newLawAction = self.createAction("&New...", self.newLaw, "Ctrl+N")
+        self.fileMenu.addAction(newLawAction)
         fileQuitAction = self.createAction("&Quit", self.close, "Ctrl+Q")
         self.fileMenu.addAction(fileQuitAction)
     
     def init_editor(self):
-        self.lawEditor = LawEditor(self)
-        self.tabs.addTab(self.lawEditor, "Create new law")
+        self.lawEditor = MyLawTab(self)
+        self.tabs.addTab(self.lawEditor, "My laws")
         
     def init_adopted_laws(self):
         self.adoptedLaws = QWidget(self)
@@ -49,7 +56,7 @@ class BitlawMainForm(QMainWindow):
         self.setCentralWidget(self.tabs)
     
     def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
         self.setMinimumSize(640, 480)
         self.init_menus()
         self.init_tabs()
