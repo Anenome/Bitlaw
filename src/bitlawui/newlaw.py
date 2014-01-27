@@ -9,6 +9,12 @@ class NewLawEditor(QMainWindow):
     instances = set()
     nextId = 1
 
+    def initFileMenu(self):
+        self.fileMenu = self.menuBar().addMenu("&File")
+
+    def initMenus(self):
+        self.initFileMenu()
+
     def initFilename(self, filename):
         self.filename = filename
         if (self.filename == ""):

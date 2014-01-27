@@ -9,8 +9,7 @@ from .newlaw import *
 
 class BitlawMainForm(QMainWindow):
     def newLaw(self):
-        newLawWindow = NewLawEditor("", self)
-        newLawWindow.show()
+        NewLawEditor().show()
 
     def createAction(self, text, slot=None, shortcut=None, checkable=False, signal="triggered()"):
         action = QAction(text, self)
@@ -21,42 +20,42 @@ class BitlawMainForm(QMainWindow):
         action.setCheckable(checkable)
         return action
     
-    def init_file_menu(self):
+    def initFileMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
         newLawAction = self.createAction("&New...", self.newLaw, "Ctrl+N")
         self.fileMenu.addAction(newLawAction)
         fileQuitAction = self.createAction("&Quit", self.close, "Ctrl+Q")
         self.fileMenu.addAction(fileQuitAction)
     
-    def init_editor(self):
-        self.lawEditor = MyLawTab(self)
-        self.tabs.addTab(self.lawEditor, "My laws")
+    def initMyLaws(self):
+        self.myLaws = MyLawTab(self)
+        self.tabs.addTab(self.myLaws, "My laws")
         
-    def init_adopted_laws(self):
+    def initAdoptedLaws(self):
         self.adoptedLaws = QWidget(self)
         self.tabs.addTab(self.adoptedLaws, "Adopted laws")
     
-    def init_active_agreements(self):
+    def initActiveAgreements(self):
         self.activeAgreements = QWidget(self)
         self.tabs.addTab(self.activeAgreements, "Active agreements")
     
-    def init_expired_agreements(self):
+    def initExpiredAgreements(self):
         self.expiredAgreements = QWidget(self)
         self.tabs.addTab(self.expiredAgreements, "Expired agreements")
     
-    def init_menus(self):
-        self.init_file_menu()
+    def initMenus(self):
+        self.initFileMenu()
     
-    def init_tabs(self):
+    def initTabs(self):
         self.tabs = QTabWidget(self)
-        self.init_editor()
-        self.init_adopted_laws()
-        self.init_active_agreements()
-        self.init_expired_agreements()
+        self.initMyLaws()
+        self.initAdoptedLaws()
+        self.initActiveAgreements()
+        self.initExpiredAgreements()
         self.setCentralWidget(self.tabs)
     
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
         self.setMinimumSize(640, 480)
-        self.init_menus()
-        self.init_tabs()
+        self.initMenus()
+        self.initTabs()
