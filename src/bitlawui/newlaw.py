@@ -4,13 +4,20 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from .common import *
 
 class NewLawEditor(QMainWindow):
     instances = set()
     nextId = 1
 
+    def newLaw(self):
+        win = NewLawEditor()
+        win.show()
+
     def initFileMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
+        newLawAction = createAction(self, "&New...", self.newLaw, "Ctrl+N")
+        self.fileMenu.addAction(newLawAction)
 
     def initMenus(self):
         self.initFileMenu()
@@ -30,3 +37,4 @@ class NewLawEditor(QMainWindow):
         self.editor = QTextBrowser(self)
         self.setCentralWidget(self.editor)
         self.initFilename(filename)
+        self.initMenus()

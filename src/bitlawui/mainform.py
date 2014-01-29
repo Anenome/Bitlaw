@@ -4,27 +4,19 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from .common import *
 from .mylawtab import *
 from .newlaw import *
 
 class BitlawMainForm(QMainWindow):
     def newLaw(self):
         NewLawEditor().show()
-
-    def createAction(self, text, slot=None, shortcut=None, checkable=False, signal="triggered()"):
-        action = QAction(text, self)
-        if shortcut is not None:
-            action.setShortcut(shortcut)
-        if slot is not None:
-            self.connect(action, SIGNAL(signal), slot)
-        action.setCheckable(checkable)
-        return action
     
     def initFileMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
-        newLawAction = self.createAction("&New...", self.newLaw, "Ctrl+N")
+        newLawAction = createAction(self, "&New...", self.newLaw, "Ctrl+N")
         self.fileMenu.addAction(newLawAction)
-        fileQuitAction = self.createAction("&Quit", self.close, "Ctrl+Q")
+        fileQuitAction = createAction(self, "&Quit", self.close, "Ctrl+Q")
         self.fileMenu.addAction(fileQuitAction)
     
     def initMyLaws(self):

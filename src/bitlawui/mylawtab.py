@@ -5,12 +5,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class LawEditor(QWidget):
+class MyLawTab(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        rootLayout = QHBoxLayout(self)
-        editorGroup = QGroupBox("Edit", self)
-        viewerGroup = QGroupBox("View", self)
-        rootLayout.addWidget(editorGroup)
-        rootLayout.addWidget(viewerGroup)
-        self.setLayout(rootLayout)
