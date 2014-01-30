@@ -6,11 +6,12 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from .common import *
 from .mylawtab import *
-from .newlaw import *
+from .mylaweditor import *
 
 class BitlawMainForm(QMainWindow):
     def newLaw(self):
-        NewLawEditor().show()
+        self.tabs.setCurrentIndex(0)
+        self.tabs.widget(0).addFile()
     
     def initFileMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
@@ -18,6 +19,10 @@ class BitlawMainForm(QMainWindow):
         self.fileMenu.addAction(newLawAction)
         fileQuitAction = createAction(self, "&Quit", self.close, "Ctrl+Q")
         self.fileMenu.addAction(fileQuitAction)
+
+    def initNewLaws(self):
+        self.newLaws = MyLawEditor(self)
+        self.tabs.addTab(self.newLaws, "Edit laws")
     
     def initMyLaws(self):
         self.myLaws = MyLawTab(self)
@@ -40,6 +45,7 @@ class BitlawMainForm(QMainWindow):
     
     def initTabs(self):
         self.tabs = QTabWidget(self)
+        self.initNewLaws()
         self.initMyLaws()
         self.initAdoptedLaws()
         self.initActiveAgreements()

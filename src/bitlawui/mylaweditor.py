@@ -16,6 +16,7 @@ class MyLawEditor(QWidget):
             MyLawEditor.nextId += 1
         self.tabs.addTab(QWidget(self), filename)
         self.files.append(Law(False, filename))
+        self.tabs.setCurrentIndex(len(self.files) - 1)
 
     def tabClose(self, index):
         if not self.files[index].modified:
