@@ -6,6 +6,7 @@ class Law:
     def __init__(self, modified = False, filename = ""):
         self.modified = modified
         self.filename = filename
+        self.hasFilename = not filename
 
     def writeToFile(self):
         pass

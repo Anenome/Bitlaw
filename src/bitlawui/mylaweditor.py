@@ -10,11 +10,34 @@ from .law import *
 class MyLawEditor(QWidget):
     nextId = 1
 
+    def saveFileAs(self):
+        index = self.tabs.currentIndex()
+        if self.files[index].hasFilename:
+            filename = self.files[index].filename
+        else:
+            filename = ""
+        filename = QFileDialog.getSaveFileName(self,
+            "Bitlaw - Save Law", filename, "Law files (*.law)")
+        if filename:
+            if "." not in filename:
+                filename += ".law"
+            self.files[index].filename = filename
+            self.files[index].hasFilename = True
+            self.files[index].modified = False
+            self.tabs.setTabText(index, filename)
+            self.files[index].writeToFile()
+            return True
+        else:
+            return False
+
     def saveFile(self):
         index = self.tabs.currentIndex()
+        if not self.files[index].hasFilename:
+            return self.saveFileAs()
         self.files[index].writeToFile()
-        self.tabs[index].setTabText(self.tabs[index].tabText(index)[1:])
+        self.tabs.setTabText(index, self.tabs.tabText(index)[1:])
         self.files[index].modified = False
+        return True
 
     def textChanged(self):
         index = self.tabs.currentIndex()
@@ -35,23 +58,31 @@ class MyLawEditor(QWidget):
     def closeFile(self, index):
         pass
 
+    def maybeSave(self, index):
+        reply = QMessageBox.question(self, "File unsaved!",
+            "Do you want to save " + self.files[index].filename + " before closing it?",
+            QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+        if reply == QMessageBox.Yes:
+            if not self.saveFile():
+                return False
+            self.closeFile(index)
+            self.tabs.removeTab(index)
+            del self.files[index]
+        elif reply == QMessageBox.No:
+            self.closeFile(index)
+            self.tabs.removeTab(index)
+            del self.files[index]
+        else:
+            return False
+        return True
+
+
     def tabClose(self, index):
         if not self.files[index].modified:
             self.tabs.removeTab(index)
             del self.files[index]
         else:
-            reply = QMessageBox.question(self, "File unsaved!",
-                "Do you want to save " + self.files[index].filename + " before closing it?",
-                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
-            if reply == QMessageBox.Yes:
-                self.files[index].writeToFile()
-                self.closeFile(index)
-                self.tabs.removeTab(index)
-                del self.files[index]
-            elif reply == QMessageBox.No:
-                self.closeFile(index)
-                self.tabs.removeTab(index)
-                del self.files[index]
+            maybeSave(index)
 
     def __init__(self, filename="", parent=None):
         QWidget.__init__(self, parent)

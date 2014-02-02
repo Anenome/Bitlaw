@@ -9,14 +9,47 @@ from .mylawtab import *
 from .mylaweditor import *
 
 class BitlawMainForm(QMainWindow):
+    def maybeSave(self):
+        for index in range(len(self.newLaws.files)):
+            if self.newLaws.files[index].modified:
+                if not self.newLaws.maybeSave(index):
+                    return False
+        return True
+
+    def closeEvent(self, event):
+        if self.maybeSave():
+            event.accept()
+        else:
+            event.ignore()
+
+    def tabChanged(self, index):
+        if index == 0:
+            self.saveLawAction.setEnabled(True)
+            self.saveLawAsAction.setEnabled(True)
+        else:
+            self.saveLawAction.setEnabled(False)
+            self.saveLawAsAction.setEnabled(False)
+
     def newLaw(self):
         self.tabs.setCurrentIndex(0)
         self.tabs.widget(0).addFile()
+
+    def saveLaw(self):
+        if self.tabs.currentIndex() == 0:
+            self.newLaws.saveFile()
+
+    def saveLawAs(self):
+        if self.tabs.currentIndex() == 0:
+            self.newLaws.saveFileAs()
     
     def initFileMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
-        newLawAction = createAction(self, "&New...", self.newLaw, "Ctrl+N")
-        self.fileMenu.addAction(newLawAction)
+        self.newLawAction = createAction(self, "&New...", self.newLaw, "Ctrl+N")
+        self.fileMenu.addAction(self.newLawAction)
+        self.saveLawAction = createAction(self, "&Save", self.saveLaw, "Ctrl+S")
+        self.fileMenu.addAction(self.saveLawAction)
+        self.saveLawAsAction = createAction(self, "Save As...", self.saveLawAs, "Ctrl+Shift+S")
+        self.fileMenu.addAction(self.saveLawAsAction)
         fileQuitAction = createAction(self, "&Quit", self.close, "Ctrl+Q")
         self.fileMenu.addAction(fileQuitAction)
 
