@@ -12,8 +12,8 @@ class MyLawEditor(QWidget):
 
     def saveFileAs(self):
         index = self.tabs.currentIndex()
-        if self.files[index].hasFilename:
-            filename = self.files[index].filename
+        if self.files[index].hasFilename():
+            filename = self.files[index].getFilename()
         else:
             filename = ""
         filename = QFileDialog.getSaveFileName(self,
@@ -21,9 +21,8 @@ class MyLawEditor(QWidget):
         if filename:
             if "." not in filename:
                 filename += ".law"
-            self.files[index].filename = filename
-            self.files[index].hasFilename = True
-            self.files[index].modified = False
+            self.files[index].setFilename(filename)
+            self.files[index].setModified(False)
             self.tabs.setTabText(index, filename)
             self.files[index].writeToFile()
             return True
@@ -32,25 +31,34 @@ class MyLawEditor(QWidget):
 
     def saveFile(self):
         index = self.tabs.currentIndex()
-        if not self.files[index].hasFilename:
+        if not self.files[index].hasFilename():
             return self.saveFileAs()
+        if not self.files[index].isModified():
+            return False
         self.files[index].writeToFile()
         self.tabs.setTabText(index, self.tabs.tabText(index)[1:])
-        self.files[index].modified = False
+        self.files[index].setModified(False)
         return True
 
     def textChanged(self):
         index = self.tabs.currentIndex()
-        if not self.files[index].modified:
-            self.files[index].modified = True
+        if not self.files[index].isModified():
+            self.files[index].setModified(True)
             self.tabs.setTabText(index, "*" + self.tabs.tabText(index))
 
-    def testAction(self):
-        print("Testing context menu")
+    def addSection(self):
+        index = self.tabs.currentIndex()
+        self.files[index].addSection()
+        self.editors[index].insertPlainText("Section " + str(self.files[index].getNumSections()) + "\n")
+
+    def addSubSection(self):
+        pass
 
     def editorContextMenu(self, point):
         menu = QMenu()
-        menu.addAction(createAction(self, "Test", self.testAction))
+        addMenu = menu.addMenu("Add")
+        addMenu.addAction(createAction(self, "Add Section", self.addSection))
+        addMenu.addAction(createAction(self, "Add Subsection", self.addSubSection))
         menu.exec_(self.editors[self.tabs.currentIndex()].mapToGlobal(point))
 
     def addFile(self, filename=""):
@@ -71,18 +79,14 @@ class MyLawEditor(QWidget):
 
     def maybeSave(self, index):
         reply = QMessageBox.question(self, "File unsaved!",
-            "Do you want to save " + self.files[index].filename + " before closing it?",
+            "Do you want to save " + self.files[index].getFilename() + " before closing it?",
             QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
             if not self.saveFile():
                 return False
             self.closeFile(index)
-            self.tabs.removeTab(index)
-            del self.files[index]
         elif reply == QMessageBox.No:
             self.closeFile(index)
-            self.tabs.removeTab(index)
-            del self.files[index]
         else:
             return False
         return True
@@ -93,7 +97,9 @@ class MyLawEditor(QWidget):
             self.tabs.removeTab(index)
             del self.files[index]
         else:
-            self.maybeSave(index)
+            if self.maybeSave(index):
+                self.tabs.removeTab(index)
+                del self.files[index]
 
     def __init__(self, filename="", parent=None):
         QWidget.__init__(self, parent)
