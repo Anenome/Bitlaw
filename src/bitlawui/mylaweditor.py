@@ -45,13 +45,24 @@ class MyLawEditor(QWidget):
             self.files[index].modified = True
             self.tabs.setTabText(index, "*" + self.tabs.tabText(index))
 
+    def testAction(self):
+        print("Testing context menu")
+
+    def editorContextMenu(self, point):
+        menu = QMenu()
+        menu.addAction(createAction(self, "Test", self.testAction))
+        menu.exec_(self.editors[self.tabs.currentIndex()].mapToGlobal(point))
+
     def addFile(self, filename=""):
         if filename == "":
             filename = "Untitled-%d" % MyLawEditor.nextId
             MyLawEditor.nextId += 1
         editor = QTextEdit(self)
+        editor.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.connect(editor, SIGNAL("customContextMenuRequested(const QPoint&)"), self.editorContextMenu)
         self.connect(editor, SIGNAL("textChanged()"), self.textChanged)
         self.tabs.addTab(editor, filename)
+        self.editors.append(editor)
         self.files.append(Law(False, filename))
         self.tabs.setCurrentIndex(len(self.files) - 1)
 
@@ -82,7 +93,7 @@ class MyLawEditor(QWidget):
             self.tabs.removeTab(index)
             del self.files[index]
         else:
-            maybeSave(index)
+            self.maybeSave(index)
 
     def __init__(self, filename="", parent=None):
         QWidget.__init__(self, parent)
@@ -93,4 +104,5 @@ class MyLawEditor(QWidget):
         self.setLayout(self.layout)
         self.connect(self.tabs, SIGNAL("tabCloseRequested(int)"), self.tabClose)
         self.files = []
+        self.editors = []
         self.addFile()
