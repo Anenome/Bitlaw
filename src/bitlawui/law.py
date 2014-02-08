@@ -7,7 +7,10 @@ class Law:
         self.modified = modified
         self.filename = filename
         self.hasFilenameValue = not filename
-        self.numSections = 0
+        self.sections = []
+
+    def getSection(self, index):
+        return self.sections[index]
 
     def isModified(self):
         return self.modified
@@ -27,7 +30,7 @@ class Law:
         return self.hasFilenameValue
 
     def getNumSections(self):
-        return self.numSections
+        return len(self.sections)
 
     def writeToFile(self):
         pass
@@ -35,15 +38,35 @@ class Law:
     def readFromFile(self):
         pass
 
-    def addSection(self):
-        self.numSections += 1
+    def addSection(self, lineNo):
+        s = LawSection("Section " + str(self.getNumSections() + 1))
+        s.setLineNumber(lineNo)
+        self.sections.append(LawSection("Section " + str(self.getNumSections() + 1)))
 
 class LawSection:
     def __init__(self, name = ""):
         self.name = name
+        self.subsections = []
+        self.lineNum = 0
+        self.text = ""
 
+    def setText(self, newText):
+        self.text = newText
+
+    def getText(self):
+        return self.text
+
+    def getLineNumber(self):
+        return self.lineNum
+
+    def setLineNumber(self, num):
+        self.lineNum = num
+        
     def getName(self):
         return self.name
 
     def setName(self, newName):
         self.name = newName
+
+    def getNumSubsections(self):
+        return len(self.subsections)
