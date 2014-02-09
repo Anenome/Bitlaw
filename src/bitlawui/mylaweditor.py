@@ -58,6 +58,7 @@ class MyLawEditor(QWidget):
             else:
                 text = text[newlineIndex + 1:]
                 newlineIndex = text.find('\n')
+                lineCount += 1
         return 0
     def addSection(self):
         index = self.tabs.currentIndex()
