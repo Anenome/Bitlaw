@@ -47,12 +47,23 @@ class MyLawEditor(QWidget):
             self.tabs.setTabText(index, "*" + self.tabs.tabText(index))
 
     def getLineOfCursorPosition(self, pos):
-        # TODO:  implement
+        index = self.tabs.currentIndex()
+        widget = self.tabs.currentWidget()
+        text = str(widget.toPlainText())
+        newlineIndex = text.find('\n')
+        lineCount = 0
+        while newlineIndex != -1:
+            if newlineIndex > pos:
+                return lineCount
+            else:
+                text = text[newlineIndex + 1:]
+                newlineIndex = text.find('\n')
         return 0
     def addSection(self):
         index = self.tabs.currentIndex()
-        self.files[index].addSection()
-        self.editors[index].insertPlainText(self.files[index].getSection(-1) + "\n")
+        lineNo = self.getLineOfCursorPosition(self.tabs.currentWidget().textCursor().position())
+        self.files[index].addSection(lineNo)
+        self.editors[index].insertPlainText(self.files[index].getSection(-1).getName() + "\n")
 
     def addSubSection(self):
         pass
