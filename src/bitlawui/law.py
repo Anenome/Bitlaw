@@ -41,6 +41,7 @@ class Law:
     def addSection(self, lineNo):
         s = LawSection("Section " + str(self.getNumSections() + 1))
         s.setLineNumber(lineNo)
+        print("Line number of new section is", s.getLineNumber())
         self.sections.append(LawSection("Section " + str(self.getNumSections() + 1)))
 
 class LawSection:
@@ -49,9 +50,27 @@ class LawSection:
         self.subsections = []
         self.lineNum = 0
         self.text = ""
+        # these are relative to lineNum
+        # both are zero if there are no contents
+        self.textStartLine = 0
+        self.textEndLine = 0
+
+    def getTextStartLine(self):
+        return self.textStartLine
+
+    def setTextStartLine(self, newVal):
+        self.textStartLine = newVal
+
+    def getTextEndLine(self):
+        return self.textEndLine
+
+    def setTextEndLine(self, newVal):
+        self.textEndLine = newVal
 
     def setText(self, newText):
         self.text = newText
+        self.textStartLine = 1
+        self.textEndLine = newText.count("\n")
 
     def getText(self):
         return self.text
