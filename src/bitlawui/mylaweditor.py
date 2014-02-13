@@ -29,6 +29,9 @@ class MyLawEditor(QWidget):
         else:
             return False
 
+    def getCurrentLineNumber(self):
+        return self.lineNo
+
     def saveFile(self):
         index = self.tabs.currentIndex()
         if not self.files[index].hasFilename():
@@ -39,6 +42,25 @@ class MyLawEditor(QWidget):
         self.tabs.setTabText(index, self.tabs.tabText(index)[1:])
         self.files[index].setModified(False)
         return True
+
+    def cursorPositionChanged(self):
+        index = self.tabs.currentIndex()
+        widget = self.tabs.currentWidget()
+        cursorPos = widget.textCursor().position()
+        text = widget.toPlainText().splitlines()
+        self.lineNo = 0
+        l = 0
+        for i in range(len(text)):
+            l = len(text[i])
+            if cursorPos > l:
+                self.lineNo += 1
+                cursorPos -= l
+            else:
+                break
+        if self.lineNo != self.prevLineNo:
+            # TODO: make some way for the user to see the current line number
+            self.files[index].setLineNumber(self.lineNo)
+        self.prevLineNo = self.lineNo
 
     def textChanged(self):
         index = self.tabs.currentIndex()
@@ -74,6 +96,7 @@ class MyLawEditor(QWidget):
         editor.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(editor, SIGNAL("customContextMenuRequested(const QPoint&)"), self.editorContextMenu)
         self.connect(editor, SIGNAL("textChanged()"), self.textChanged)
+        self.connect(editor, SIGNAL("cursorPositionChanged()"), self.cursorPositionChanged)
         self.tabs.addTab(editor, filename)
         self.editors.append(editor)
         self.files.append(Law(False, filename))
@@ -106,6 +129,7 @@ class MyLawEditor(QWidget):
                 self.tabs.removeTab(index)
                 del self.files[index]
 
+    
     def __init__(self, filename="", parent=None):
         QWidget.__init__(self, parent)
         self.tabs = QTabWidget(self)
@@ -114,6 +138,8 @@ class MyLawEditor(QWidget):
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
         self.connect(self.tabs, SIGNAL("tabCloseRequested(int)"), self.tabClose)
+        self.lineNo = 0
+        self.prevLineNo = 0
         self.files = []
         self.editors = []
         self.addFile()

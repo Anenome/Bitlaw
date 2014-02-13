@@ -8,6 +8,8 @@ class Law:
         self.filename = filename
         self.hasFilenameValue = not filename
         self.sections = []
+        self.currentSection = None
+        self.currentLineNo = 0
 
     def getSection(self, index):
         return self.sections[index]
@@ -37,6 +39,23 @@ class Law:
 
     def readFromFile(self):
         pass
+
+    def searchSectionsByLineNo(self, lineNo, minIndex, maxIndex):
+        if minIndex > maxIndex or len(self.sections) == 0:
+            return None
+        mid = int((maxIndex + minIndex) / 2)
+        section = self.sections[mid]
+        if section.getTextStartLine() > lineNo:
+            return self.searchSectionsByLineNo(lineNo, minIndex, mid - 1)
+        elif section.getTextEndLine() < lineNo:
+            return self.searchSectionsByLineNo(lineNo, mid + 1, maxIndex)
+        else:
+            return section
+
+    def setLineNumber(self, lineNo):
+        self.currentLineNo = lineNo
+        # the sections are guaranteed to be added in order of their lines, so it can be binary searched
+        self.currentSection = self.searchSectionsByLineNo(lineNo, 0, len(self.sections) - 1)
 
     def addSection(self, lineNo):
         s = LawSection("Section " + str(self.getNumSections() + 1))
