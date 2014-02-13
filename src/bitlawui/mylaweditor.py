@@ -58,8 +58,8 @@ class MyLawEditor(QWidget):
             else:
                 break
         if self.lineNo != self.prevLineNo:
-            # TODO: make some way for the user to see the current line number
             self.files[index].setLineNumber(self.lineNo)
+            self.lineLabel.setText("Line: %d" % (self.lineNo + 1))
         self.prevLineNo = self.lineNo
 
     def textChanged(self):
@@ -134,8 +134,10 @@ class MyLawEditor(QWidget):
         QWidget.__init__(self, parent)
         self.tabs = QTabWidget(self)
         self.tabs.setTabsClosable(True)
-        self.layout = QHBoxLayout(self)
+        self.lineLabel = QLabel("Line: 1", self)
+        self.layout = QVBoxLayout(self)
         self.layout.addWidget(self.tabs)
+        self.layout.addWidget(self.lineLabel)
         self.setLayout(self.layout)
         self.connect(self.tabs, SIGNAL("tabCloseRequested(int)"), self.tabClose)
         self.lineNo = 0
