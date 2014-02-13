@@ -2,6 +2,8 @@
 # Copyright (c) 2014 Johan Burke
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
+from .common import *
+
 class Law:
     def __init__(self, modified = False, filename = ""):
         self.modified = modified
@@ -34,8 +36,31 @@ class Law:
     def getNumSections(self):
         return len(self.sections)
 
+    def writeSection(self, stream, section):
+        stream << "<section>\n"
+        stream << "\t<title>\n"
+        stream << "\t\t" + section.getName() + "\n"
+        stream << "\t</title>\n"
+        stream << "\t<text>\n"
+        stream << "\t\t" + section.getText() + "\n"
+        stream << "\t</text>\n"
+        stream << "</section>\n"
+
     def writeToFile(self):
-        pass
+        fh = None
+        error = None
+        fh = QFile(self.filenameValue)
+        if not fh.open(QIODevice.WriteOnly):
+            return
+        stream = QTextStream(fh)
+        stream.setCodec(CODEC)
+        stream << "<?xml version='1.0' encoding='%s'?>\n" % CODEC
+        stream << "<law>\n"
+        for section in self.sections:
+            self.writeSection(stream, section)
+        stream << "</law>\n"
+        if fh is not None:
+            fh.close()
 
     def readFromFile(self):
         pass
