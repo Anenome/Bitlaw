@@ -41,11 +41,17 @@ class BitlawMainForm(QMainWindow):
     def saveLawAs(self):
         if self.tabs.currentIndex() == 0:
             self.newLaws.saveFileAs()
-    
+
+    def openLaw(self):
+        if self.tabs.currentIndex() == 0:
+            self.newLaws.openFile()
+
     def initFileMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
         self.newLawAction = createAction(self, "&New...", self.newLaw, "Ctrl+N")
         self.fileMenu.addAction(self.newLawAction)
+        self.openLawAction = createAction(self, "&Open...", self.openLaw, "Ctrl+O")
+        self.fileMenu.addAction(self.openLawAction)
         self.saveLawAction = createAction(self, "&Save", self.saveLaw, "Ctrl+S")
         self.fileMenu.addAction(self.saveLawAction)
         self.saveLawAsAction = createAction(self, "Save As...", self.saveLawAs, "Ctrl+Shift+S")
@@ -84,7 +90,7 @@ class BitlawMainForm(QMainWindow):
         self.initActiveAgreements()
         self.initExpiredAgreements()
         self.setCentralWidget(self.tabs)
-    
+
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
         self.setMinimumSize(640, 480)

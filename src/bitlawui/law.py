@@ -3,12 +3,13 @@
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
 from .common import *
+from PyQt4.QtXml import *
 
 class Law:
     def __init__(self, modified = False, filename = ""):
         self.modified = modified
         self.filename = filename
-        self.hasFilenameValue = not filename
+        self.hasFilenameValue = filename != ""
         self.sections = []
         self.currentSection = None
         self.currentLineNo = 0
@@ -47,23 +48,58 @@ class Law:
         stream << "</section>\n"
 
     def writeToFile(self):
-        fh = None
-        error = None
         fh = QFile(self.filenameValue)
         if not fh.open(QIODevice.WriteOnly):
             return
         stream = QTextStream(fh)
         stream.setCodec(CODEC)
         stream << "<?xml version='1.0' encoding='%s'?>\n" % CODEC
-        stream << "<law>\n"
+        stream << "<" + LAW_TAG_NAME + ">\n"
         for section in self.sections:
             self.writeSection(stream, section)
-        stream << "</law>\n"
+        stream << "</" + LAW_TAG_NAME + ">\n"
         if fh is not None:
             fh.close()
 
+    def getText(self, node):
+        child = node.firstChild()
+        text = ""
+        while not child.isNull():
+            if child.nodeType() == QDomNode.TextNode:
+                text += str(child.toText().data())
+            child = child.nextSibling()
+        return text.strip()
+
+    def readSection(self, sectionElement):
+        section = LawSection()
+        name = text = None
+        node = sectionElement.firstChild()
+        while (name is None or text is None) and not node.isNull():
+            if node.toElement().tagName() == LAW_SECTION_TITLE_TAG_NAME:
+                section.setName(self.getText(node))
+            elif node.toElement().tagName() == LAW_SECTION_TEXT_TAG_NAME:
+                section.setText(self.getText(node))
+            node = node.nextSibling()
+        return section
+
     def readFromFile(self):
-        pass
+        # TODO: add proper error handling
+        fh = QFile(self.filenameValue)
+        dom = QDomDocument()
+        if not fh.open(QIODevice.ReadOnly):
+            return
+        if not dom.setContent(fh):
+            return
+        if fh is not None:
+            fh.close()
+        root = dom.documentElement()
+        if root.tagName() != LAW_TAG_NAME:
+            return
+        node = root.firstChild()
+        while not node.isNull():
+            if node.toElement().tagName() == LAW_SECTION_TAG_NAME:
+                self.sections.append(self.readSection(node.toElement()))
+            node = node.nextSibling()
 
     def searchSectionsByLineNo(self, lineNo, minIndex, maxIndex):
         if minIndex > maxIndex or len(self.sections) == 0:

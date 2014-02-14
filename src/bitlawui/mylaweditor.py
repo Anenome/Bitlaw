@@ -29,6 +29,16 @@ class MyLawEditor(QWidget):
         else:
             return False
 
+    def openFile(self):
+        filename = QFileDialog.getOpenFileName(self,
+            "Bitlaw - Open Law", "", "Law files (*.law)")
+        if filename:
+            newFile = Law()
+            newFile.setFilename(filename)
+            newFile.readFromFile()
+            self.files.append(newFile)
+            self.addFile(filename)
+
     def getCurrentLineNumber(self):
         return self.lineNo
 
@@ -89,17 +99,17 @@ class MyLawEditor(QWidget):
         menu.exec_(self.editors[self.tabs.currentIndex()].mapToGlobal(point))
 
     def addFile(self, filename=""):
-        if filename == "":
-            filename = "Untitled-%d" % MyLawEditor.nextId
-            MyLawEditor.nextId += 1
         editor = QTextEdit(self)
         editor.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(editor, SIGNAL("customContextMenuRequested(const QPoint&)"), self.editorContextMenu)
         self.connect(editor, SIGNAL("textChanged()"), self.textChanged)
         self.connect(editor, SIGNAL("cursorPositionChanged()"), self.cursorPositionChanged)
+        if filename == "":
+            filename = "Untitled-%d" % MyLawEditor.nextId
+            MyLawEditor.nextId += 1
+            self.files.append(Law())
         self.tabs.addTab(editor, filename)
         self.editors.append(editor)
-        self.files.append(Law(False, filename))
         self.tabs.setCurrentIndex(len(self.files) - 1)
 
     def closeFile(self, index):
