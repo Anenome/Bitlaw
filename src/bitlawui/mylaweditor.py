@@ -2,6 +2,7 @@
 # Copyright (c) 2014 Johan Burke
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
+from os.path import basename
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from .common import *
@@ -29,6 +30,18 @@ class MyLawEditor(QWidget):
         else:
             return False
 
+    def loadText(self):
+        index = self.tabs.currentIndex()
+        widget = self.tabs.currentWidget()
+        text = ""
+        for section in self.files[index].getSections():
+            text += section.getName() + "\n"
+            if section.getText() != "":
+                text += section.getText() + "\n"
+        widget.setText(text)
+        self.files[index].setModified(False)
+        self.tabs.setTabText(index, self.tabs.tabText(index)[1:])
+
     def openFile(self):
         filename = QFileDialog.getOpenFileName(self,
             "Bitlaw - Open Law", "", "Law files (*.law)")
@@ -38,6 +51,7 @@ class MyLawEditor(QWidget):
             newFile.readFromFile()
             self.files.append(newFile)
             self.addFile(filename)
+            self.loadText()
 
     def getCurrentLineNumber(self):
         return self.lineNo
@@ -108,6 +122,8 @@ class MyLawEditor(QWidget):
             filename = "Untitled-%d" % MyLawEditor.nextId
             MyLawEditor.nextId += 1
             self.files.append(Law())
+        else:
+            filename = basename(filename)
         self.tabs.addTab(editor, filename)
         self.editors.append(editor)
         self.tabs.setCurrentIndex(len(self.files) - 1)
