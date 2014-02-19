@@ -7,6 +7,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from .common import *
 from .law import *
+from .lawtextedit import *
 
 class MyLawEditor(QWidget):
     nextId = 1
@@ -70,21 +71,11 @@ class MyLawEditor(QWidget):
     def cursorPositionChanged(self):
         index = self.tabs.currentIndex()
         widget = self.tabs.currentWidget()
-        cursorPos = widget.textCursor().position()
-        text = widget.toPlainText().splitlines()
-        self.lineNo = 0
-        l = 0
-        for i in range(len(text)):
-            l = len(text[i])
-            if cursorPos > l:
-                self.lineNo += 1
-                cursorPos -= l
-            else:
-                break
-        if self.lineNo != self.prevLineNo:
-            self.files[index].setLineNumber(self.lineNo)
-            self.lineLabel.setText("Line: %d" % (self.lineNo + 1))
-        self.prevLineNo = self.lineNo
+        currLine = widget.currentLineNumber()
+        if currLine != self.prevLineNo:
+            self.files[index].setLineNumber(currLine)
+            self.lineLabel.setText("Line: %d" % (currLine + 1))
+        self.prevLineNo = currLine
 
     def textChanged(self):
         index = self.tabs.currentIndex()
@@ -113,7 +104,7 @@ class MyLawEditor(QWidget):
         menu.exec_(self.editors[self.tabs.currentIndex()].mapToGlobal(point))
 
     def addFile(self, filename=""):
-        editor = QTextEdit(self)
+        editor = LawTextEdit(self)
         editor.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(editor, SIGNAL("customContextMenuRequested(const QPoint&)"), self.editorContextMenu)
         self.connect(editor, SIGNAL("textChanged()"), self.textChanged)
@@ -132,8 +123,11 @@ class MyLawEditor(QWidget):
         pass
 
     def maybeSave(self, index):
+        text = self.tabs.tabText(index)
+        if "*" in text:
+            text = text[1:]
         reply = QMessageBox.question(self, "File unsaved!",
-            "Do you want to save " + self.files[index].getFilename() + " before closing it?",
+            "Do you want to save " + text + " before closing it?",
             QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
             if not self.saveFile():
@@ -147,13 +141,11 @@ class MyLawEditor(QWidget):
 
 
     def tabClose(self, index):
-        if not self.files[index].modified:
-            self.tabs.removeTab(index)
-            del self.files[index]
-        else:
-            if self.maybeSave(index):
-                self.tabs.removeTab(index)
-                del self.files[index]
+        if self.files[index].modified:
+            if self.maybeSave(index) != True:
+                return
+        self.tabs.removeTab(index)
+        del self.files[index]
 
     
     def __init__(self, filename="", parent=None):

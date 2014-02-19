@@ -11,6 +11,24 @@ class LawTextEdit(QTextEdit):
     def __init__(self, parent=None):
         QTextEdit.__init__(self, parent)
         self.linesEditable = [True]
+        self.lineNo = 0
+        self.connect(self, SIGNAL("cursorPositionChanged()"), self.cursorPositionChanged)
+
+    def currentLineNumber(self):
+        return self.lineNo
+
+    def cursorPositionChanged(self):
+        cursorPos = self.textCursor().position()
+        text = self.toPlainText().splitlines()
+        self.lineNo = 0
+        l = 0
+        for i in range(len(text)):
+            l = len(text[i])
+            if cursorPos > l:
+                self.lineNo += 1
+                cursorPos -= l
+            else:
+                break
 
     def keyPressEvent(self, event):
         # TODO: ensure non-editable lines cannot be modified
