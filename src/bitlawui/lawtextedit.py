@@ -7,7 +7,6 @@ from PyQt4.QtGui import *
 from .law import *
 
 class LawTextEdit(QTextEdit):
-    # TODO: move code that finds the current line from MyLawEditor to this class
     def __init__(self, parent=None):
         QTextEdit.__init__(self, parent)
         self.linesEditable = [True]
@@ -30,14 +29,33 @@ class LawTextEdit(QTextEdit):
             else:
                 break
 
+    def isArrow(self, key):
+        return key == Qt.Key_Left or key == Qt.Key_Up or key == Qt.Key_Right or key == Qt.Key_Down
+
     def keyPressEvent(self, event):
         # TODO: ensure non-editable lines cannot be modified
         # TODO: ensure non-editable lines cannot have newlines inserted in their middle
-        acceptKey = True
-        if event.key() == Qt.Key_Return:
-            self.linesEditable.append(True)
-        if acceptKey:
+        print("Editable lines:",self.linesEditable)
+        acceptKey = self.linesEditable[self.lineNo]
+        checkLines = False
+        l = 0
+        if self.isArrow(event.key()):
             QTextEdit.keyPressEvent(self, event)
+        elif acceptKey:
+            if event.key() == Qt.Key_Return:
+                self.linesEditable.append(True)
+            elif event.key() == Qt.Key_Backspace:
+                checkLines = True
+                l = self.lineNo
+            QTextEdit.keyPressEvent(self, event)
+            if checkLines:
+                if str(self.toPlainText()).count('\n') < len(self.linesEditable):
+                    del self.linesEditable[self.lineNo:l]
 
     def setLineEditable(self, lineNumber, editable):
         self.linesEditable[lineNumber] = editable
+
+    def insertPlainText(self, text):
+        QTextEdit.insertPlainText(self, text)
+        for i in range(text.count('\n')):
+            self.linesEditable.insert(self.lineNo + i, True)
