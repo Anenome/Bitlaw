@@ -29,8 +29,8 @@ class LawTextEdit(QTextEdit):
             else:
                 break
 
-    def isArrow(self, key):
-        return key == Qt.Key_Left or key == Qt.Key_Up or key == Qt.Key_Right or key == Qt.Key_Down
+    def isPrinting(self, key):
+        return key >= Qt.Key_Space and key <= Qt.Key_ydiaeresis
 
     def keyPressEvent(self, event):
         # TODO: ensure non-editable lines cannot be modified
@@ -39,7 +39,7 @@ class LawTextEdit(QTextEdit):
         acceptKey = self.linesEditable[self.lineNo]
         checkLines = False
         l = 0
-        if self.isArrow(event.key()):
+        if not self.isPrinting(event.key()):
             QTextEdit.keyPressEvent(self, event)
         elif acceptKey:
             if event.key() == Qt.Key_Return:
@@ -48,9 +48,10 @@ class LawTextEdit(QTextEdit):
                 checkLines = True
                 l = self.lineNo
             QTextEdit.keyPressEvent(self, event)
+            #TODO: fix this
             if checkLines:
                 if str(self.toPlainText()).count('\n') < len(self.linesEditable):
-                    del self.linesEditable[self.lineNo:l]
+                    del self.linesEditable[l]
 
     def setLineEditable(self, lineNumber, editable):
         self.linesEditable[lineNumber] = editable
