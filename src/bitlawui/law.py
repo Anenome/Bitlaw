@@ -9,10 +9,13 @@ class Law:
     def __init__(self, modified = False, filename = ""):
         self.modified = modified
         self.filename = filename
-        self.hasFilenameValue = filename != ""
+        self.hasFilenameValue = (filename != "")
         self.sections = []
         self.currentSection = None
         self.currentLineNo = 0
+
+    def getSections(self):
+        return self.sections
 
     def getSection(self, index):
         return self.sections[index]
@@ -38,14 +41,14 @@ class Law:
         return len(self.sections)
 
     def writeSection(self, stream, section):
-        stream << "<section>\n"
-        stream << "\t<title>\n"
+        stream << "<" + LAW_SECTION_TAG_NAME +">\n"
+        stream << "\t<" + LAW_SECTION_TITLE_TAG_NAME +">\n"
         stream << "\t\t" + section.getName() + "\n"
-        stream << "\t</title>\n"
-        stream << "\t<text>\n"
+        stream << "\t</" + LAW_SECTION_TITLE_TAG_NAME +">\n"
+        stream << "\t<" + LAW_SECTION_TEXT_TAG_NAME +">\n"
         stream << "\t\t" + section.getText() + "\n"
-        stream << "\t</text>\n"
-        stream << "</section>\n"
+        stream << "\t</" + LAW_SECTION_TEXT_TAG_NAME +">\n"
+        stream << "</" + LAW_SECTION_TAG_NAME +">\n"
 
     def writeToFile(self):
         fh = QFile(self.filenameValue)

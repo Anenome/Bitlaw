@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Copyright (c) 2014 Johan Burke
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,6 +6,7 @@ from PyQt4.QtGui import *
 from .common import *
 from .mylawtab import *
 from .mylaweditor import *
+from .pyelliptic import *
 
 class BitlawMainForm(QMainWindow):
     def maybeSave(self):

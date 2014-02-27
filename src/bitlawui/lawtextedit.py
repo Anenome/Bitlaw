@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Copyright (c) 2014 Johan Burke
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
@@ -28,6 +27,7 @@ class LawTextEdit(QTextEdit):
                 cursorPos -= l
             else:
                 break
+        print("cursor line is",self.lineNo)
 
     def isPrinting(self, key):
         return key >= Qt.Key_Space and key <= Qt.Key_ydiaeresis
@@ -35,8 +35,8 @@ class LawTextEdit(QTextEdit):
     def keyPressEvent(self, event):
         # TODO: ensure non-editable lines cannot be modified
         # TODO: ensure non-editable lines cannot have newlines inserted in their middle
-        print("Editable lines:",self.linesEditable)
-        acceptKey = self.linesEditable[self.lineNo]
+        print("keyPressEvent")
+        acceptKey = self.linesEditable[self.lineNo - 1]
         checkLines = False
         l = 0
         if not self.isPrinting(event.key()):

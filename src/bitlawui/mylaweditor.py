@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Copyright (c) 2014 Johan Burke
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
@@ -92,6 +91,7 @@ class MyLawEditor(QWidget):
         lineNo = str(widget.toPlainText()).count("\n")
         self.files[index].addSection(lineNo)
         self.editors[index].insertPlainText(self.files[index].getSection(-1).getName() + "\n")
+        widget.setLineEditable(lineNo, False)
 
     def addSubSection(self):
         pass
