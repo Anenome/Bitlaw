@@ -4,11 +4,20 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from .common import *
-from .mylawtab import *
 from .mylaweditor import *
 from .pyelliptic import *
+from .newaddressdialog import *
 
 class BitlawMainForm(QMainWindow):
+    def loadSettings(self):
+        self.settings = QSettings()
+        geo = self.settings.value("MainWindow/Geometry", None)
+        if geo is not None:
+            self.restoreGeometry(self.settings.value("MainWindow/Geometry"))    
+        else:
+            self.setGeometry(0, 0, 640, 480)
+        self.firstTime = self.settings.value("MainWindow/FirstRun", True)
+
     def maybeSave(self):
         for index in range(len(self.newLaws.files)):
             if self.newLaws.files[index].modified:
@@ -16,8 +25,13 @@ class BitlawMainForm(QMainWindow):
                     return False
         return True
 
+    def saveSettings(self):
+        self.settings.setValue("MainWindow/Geometry", self.saveGeometry())
+        self.settings.setValue("MainWindow/FirstRun", False)
+
     def closeEvent(self, event):
         if self.maybeSave():
+            self.saveSettings()
             event.accept()
         else:
             event.ignore()
@@ -64,7 +78,7 @@ class BitlawMainForm(QMainWindow):
         self.tabs.addTab(self.newLaws, "Edit laws")
     
     def initMyLaws(self):
-        self.myLaws = MyLawTab(self)
+        self.myLaws = QWidget(self)
         self.tabs.addTab(self.myLaws, "My laws")
         
     def initAdoptedLaws(self):
@@ -93,6 +107,12 @@ class BitlawMainForm(QMainWindow):
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
-        self.setMinimumSize(640, 480)
+        self.loadSettings()
         self.initMenus()
         self.initTabs()
+        self.show()
+        if self.firstTime:
+            newAddressDialog = NewAddressDialog(self)
+            if newAddressDialog.exec_():
+                # do stuff here
+                pass
