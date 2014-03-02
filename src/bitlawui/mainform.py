@@ -111,7 +111,7 @@ class BitlawMainForm(QMainWindow):
         self.initMenus()
         self.initTabs()
         self.show()
-        if self.firstTime:
+        if self.firstTime == True:
             newAddressDialog = NewAddressDialog(self)
             if newAddressDialog.exec_():
                 # do stuff here
