@@ -16,7 +16,7 @@ class BitlawMainForm(QMainWindow):
             self.restoreGeometry(self.settings.value("MainWindow/Geometry"))    
         else:
             self.setGeometry(0, 0, 640, 480)
-        self.firstTime = self.settings.value("MainWindow/FirstRun", True)
+        self.firstTime = self.settings.value("MainWindow/FirstRun", 'True')
 
     def maybeSave(self):
         for index in range(len(self.newLaws.files)):
@@ -27,7 +27,7 @@ class BitlawMainForm(QMainWindow):
 
     def saveSettings(self):
         self.settings.setValue("MainWindow/Geometry", self.saveGeometry())
-        self.settings.setValue("MainWindow/FirstRun", False)
+        self.settings.setValue("MainWindow/FirstRun", 'False')
 
     def closeEvent(self, event):
         if self.maybeSave():
@@ -111,7 +111,7 @@ class BitlawMainForm(QMainWindow):
         self.initMenus()
         self.initTabs()
         self.show()
-        if self.firstTime == True:
+        if self.firstTime == 'True':
             newAddressDialog = NewAddressDialog(self)
             if newAddressDialog.exec_():
                 # do stuff here
