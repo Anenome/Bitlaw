@@ -35,7 +35,6 @@ class LawTextEdit(QTextEdit):
     def keyPressEvent(self, event):
         # TODO: ensure non-editable lines cannot be modified
         # TODO: ensure non-editable lines cannot have newlines inserted in their middle
-        print("keyPressEvent")
         acceptKey = self.linesEditable[self.lineNo - 1]
         checkLines = False
         l = 0

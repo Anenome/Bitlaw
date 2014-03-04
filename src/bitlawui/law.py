@@ -123,7 +123,6 @@ class Law:
     def addSection(self, lineNo):
         s = LawSection("Section " + str(self.getNumSections() + 1))
         s.setLineNumber(lineNo)
-        print("Line number of new section is", s.getLineNumber())
         self.sections.append(LawSection("Section " + str(self.getNumSections() + 1)))
 
 class LawSection:
