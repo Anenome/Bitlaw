@@ -3,4 +3,4 @@
 
 # This file includes constants used by several files.  DO NOT CHANGE THEIR VALUES.
 VERSION = 1
-ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ+-"
+ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-"
