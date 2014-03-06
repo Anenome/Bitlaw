@@ -7,21 +7,34 @@ from ..utilities.constants import *
 import hashlib
 from struct import *
 
+def encodeInt(val, alphabet = ALPHABET):
+    base = len(alphabet)
+    result = ""
+    while val > 0:
+        rem = val % base
+        result = str(alphabet[rem]) + result
+        val = val // base
+    return result
+
 class Address:
     def __init__(self, hashValue, version=VERSION):
         self.version = version
         self.hashValue = hashValue
+        self.encodedValue = ""
 
     def encodeVersion(self):
+        # return the version as a big-endian unsigned byte.
         return pack('>B', self.version)
 
     def encode(self):
         a = self.encodeVersion() + self.hashValue
-        safePrint(a)
         sha = hashlib.new('sha512')
         sha.update(a)
         sha.update(sha.digest())
-        checksum = sha.digest()[0:4]
+        checksum = sha.digest()[0:2]
+        intValue = int.from_bytes(a + checksum, 'big')
+        # this value is in base 64
+        self.encodedValue = encodeInt(intValue)
 
 def genAddress():
     curve = ECC()
