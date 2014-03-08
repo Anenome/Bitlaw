@@ -1,7 +1,8 @@
 # Copyright (c) 2014 Johan Burke
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
-from .common import *
+from .utilities.constants import *
+from PyQt4.QtCore import *
 from PyQt4.QtXml import *
 
 class Law:
