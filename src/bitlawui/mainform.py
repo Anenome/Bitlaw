@@ -4,19 +4,20 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from .common import *
+from .config import *
 from .mylaweditor import *
-from .pyelliptic import *
 from .newaddressdialog import *
+from .utilities.constants import *
 
 class BitlawMainForm(QMainWindow):
     def loadSettings(self):
-        self.settings = QSettings()
-        geo = self.settings.value("MainWindow/Geometry", None)
-        if geo is not None:
-            self.restoreGeometry(self.settings.value("MainWindow/Geometry"))    
-        else:
-            self.setGeometry(0, 0, 640, 480)
-        self.firstTime = self.settings.value("MainWindow/FirstRun", 'True')
+        self.config = Config()
+        self.config.loadFromQtSettings()
+        self.restoreGeometry(self.config.geometry)
+        self.firstTime = self.config.firstTime
+        if self.firstTime == 'False':
+            # TODO: load keys
+            pass
 
     def maybeSave(self):
         for index in range(len(self.newLaws.files)):
@@ -26,8 +27,7 @@ class BitlawMainForm(QMainWindow):
         return True
 
     def saveSettings(self):
-        self.settings.setValue("MainWindow/Geometry", self.saveGeometry())
-        self.settings.setValue("MainWindow/FirstRun", 'False')
+        self.config.saveToQtSettings()
 
     def closeEvent(self, event):
         if self.maybeSave():
@@ -114,5 +114,4 @@ class BitlawMainForm(QMainWindow):
         if self.firstTime == 'True':
             newAddressDialog = NewAddressDialog(self)
             if newAddressDialog.exec_():
-                # do stuff here
-                pass
+                self.config.keys.append(newAddressDialog.key)

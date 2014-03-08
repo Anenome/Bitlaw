@@ -4,8 +4,10 @@
 from ..pyelliptic.ecc import *
 from ..utilities.threadutils import *
 from ..utilities.constants import *
+from .key import *
 import hashlib
 from struct import *
+import sys
 
 def encodeInt(val, alphabet = ALPHABET):
     base = len(alphabet)
@@ -36,11 +38,11 @@ class Address:
         # this value is in base 64
         self.encodedValue = encodeInt(intValue)
 
-def genAddress():
+def genKey():
     curve = ECC()
-    pub_key = curve.get_pubkey()
+    pubKey = curve.get_pubkey()
     sha = hashlib.new('sha512')
-    sha.update(pub_key)
+    sha.update(pubKey)
     ripemd = hashlib.new('ripemd160')
     ripemd.update(sha.digest())
     sha.update(ripemd.digest())
@@ -48,4 +50,5 @@ def genAddress():
     #safePrint(ripemd.digest())
     a = Address(ripemd.digest())
     a.encode()
-    return a
+    key = Key(pubKey, curve.get_privkey(), a.encodedValue)
+    return key
