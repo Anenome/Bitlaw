@@ -7,6 +7,7 @@ from .common import *
 from .config import *
 from .mylaweditor import *
 from .newaddressdialog import *
+from .settingsdialog import *
 from .utilities.constants import *
 
 class BitlawMainForm(QMainWindow):
@@ -60,6 +61,12 @@ class BitlawMainForm(QMainWindow):
         if self.tabs.currentIndex() == 0:
             self.newLaws.openFile()
 
+    def changeSettings(self):
+        settingsDialog = SettingsDialog(self, self.config)
+        if settingsDialog.exec_():
+            # TODO: change settings here
+            pass
+
     def initFileMenu(self):
         self.fileMenu = self.menuBar().addMenu("&File")
         self.newLawAction = createAction(self, "&New...", self.newLaw, "Ctrl+N")
@@ -70,6 +77,8 @@ class BitlawMainForm(QMainWindow):
         self.fileMenu.addAction(self.saveLawAction)
         self.saveLawAsAction = createAction(self, "Save As...", self.saveLawAs, "Ctrl+Shift+S")
         self.fileMenu.addAction(self.saveLawAsAction)
+        self.preferencesAction = createAction(self, "Preferences...", self.changeSettings)
+        self.fileMenu.addAction(self.preferencesAction)
         fileQuitAction = createAction(self, "&Quit", self.close, "Ctrl+Q")
         self.fileMenu.addAction(fileQuitAction)
 
@@ -107,6 +116,7 @@ class BitlawMainForm(QMainWindow):
 
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
+        self.setWindowTitle("Bitlaw")
         self.loadSettings()
         self.initMenus()
         self.initTabs()
