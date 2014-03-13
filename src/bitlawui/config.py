@@ -4,19 +4,26 @@
 from PyQt4.QtCore import *
 from .protocol.key import *
 from .utilities.constants import *
+from struct import *
 
 class Config:
     def loadKeys(self):
         try:
             with open(self.keyFileLocation, 'rb') as keyFile:
                 # currently limited to 255 keys, may change later
-                numKeys = keyFile.read(1)
+                numKeys = unpack('>B', keyFile.read(1))[0]
                 for i in range(numKeys):
                     k = Key()
                     k.loadFromFile(keyFile)
                     self.keys.append(k)
         except FileNotFoundError:
             pass
+
+    def saveKeys(self):
+        with open(self.keyFileLocation, 'wb') as keyFile:
+            keyFile.write(pack(">B", len(self.keys)))
+            for k in self.keys:
+                k.writeToFile(keyFile)
 
     def loadFromQtSettings(self):
         self.settings = QSettings()
@@ -33,9 +40,11 @@ class Config:
         self.settings.setValue("MainWindow/Geometry", self.geometry)
 
         # just set this to true if testing is needed
-        self.settings.setValue("MainWindow/FirstTime", 'True')
+        self.settings.setValue("MainWindow/FirstTime", 'False')
         self.settings.setValue("Keys/FileLocation", KEYS_LOCATION)
+        self.saveKeys()
 
 
     def __init__(self):
         self.keys = []
+        self.keyFileLocation = KEYS_LOCATION
