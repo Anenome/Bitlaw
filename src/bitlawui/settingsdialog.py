@@ -5,6 +5,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from .protocol.address import *
 from .config import *
+from .common import *
 
 class AddressSettings(QWidget):
     def populateList(self):
@@ -12,6 +13,15 @@ class AddressSettings(QWidget):
         for key in self.config.keys:
             item = QListWidgetItem(key.address)
             self.addressesList.addItem(item)
+
+    def copyAddress(self):
+        clipboard = QApplication.clipboard()
+        clipboard.setText(self.addressesList.currentItem().text())
+
+    def addressesContextMenu(self, point):
+        menu = QMenu()
+        menu.addAction(createAction(self, "Copy", self.copyAddress))
+        menu.exec_(self.addressesList.mapToGlobal(point))
 
     def __init__(self, parent, config):
         QWidget.__init__(self, parent)
@@ -22,6 +32,8 @@ class AddressSettings(QWidget):
 
         self.addressesList = QListWidget()
         self.populateList()
+        self.addressesList.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.connect(self.addressesList, SIGNAL("customContextMenuRequested(const QPoint&)"), self.addressesContextMenu)
 
         layout.addWidget(self.addressesList, 1, 1)
 
