@@ -13,4 +13,7 @@ LAW_SECTION_TEXT_TAG_NAME = "text"
 
 VERSION = 1
 ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-"
-KEYS_LOCATION = os.path.expanduser("~/Bitlaw/keys.dat")
+KEYS_LOCATION = os.path.expanduser("~/Bitlaw/")
+KEYS_FILE = KEYS_LOCATION + "keys.dat"
+DEFAULT_PORT_NUMBER = 8850
+DEFAULT_KNOWN_PEERS = ["192.168.1.115"]
