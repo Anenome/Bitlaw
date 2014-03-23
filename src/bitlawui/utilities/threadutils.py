@@ -7,6 +7,9 @@ import threading
 # don't refer to this directly, use safePrint(x)
 printLock = threading.Lock()
 
-def safePrint(x):
+def safePrint(*x):
+    s = ""
+    for obj in x:
+        s += str(obj)
     with printLock:
-        print(x)
+        print(s)
