@@ -9,16 +9,17 @@ from .mylaweditor import *
 from .newaddressdialog import *
 from .settingsdialog import *
 from .utilities.constants import *
+from .utilities.threadutils import *
 
 class BitlawMainForm(QMainWindow):
     def loadSettings(self):
         self.config = Config()
         self.config.loadFromQtSettings()
-        self.restoreGeometry(self.config.geometry)
+        if self.config.firstTime == 'True':
+            self.setGeometry(self.config.geometry)
+        elif self.config.firstTime == 'False':
+            self.restoreGeometry(self.config.geometry)
         self.firstTime = self.config.firstTime
-        if self.firstTime == 'False':
-            # TODO: load keys
-            pass
 
     def maybeSave(self):
         for index in range(len(self.newLaws.files)):
@@ -32,7 +33,9 @@ class BitlawMainForm(QMainWindow):
 
     def closeEvent(self, event):
         if self.maybeSave():
+            self.config.geometry = self.saveGeometry()
             self.saveSettings()
+            shutdown = True
             event.accept()
         else:
             event.ignore()
