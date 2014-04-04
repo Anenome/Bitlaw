@@ -3,7 +3,7 @@
 
 from PyQt4.QtCore import *
 from .protocol.key import *
-from .utilities.constants import *
+from .constants import *
 from struct import *
 import os
 import os.path

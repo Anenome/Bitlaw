@@ -2,8 +2,8 @@
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
 from ..pyelliptic.ecc import *
-from ..utilities.threadutils import *
-from ..utilities.constants import *
+from ..threads.threadutils import *
+from ..constants import *
 from .key import *
 import hashlib
 from struct import *

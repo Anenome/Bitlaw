@@ -2,7 +2,7 @@
 # Distributed under the MIT software license.  See http://www.opensource.org/licenses/mit-license.php.
 
 import threading
-from .constants import *
+from ..constants import *
 from ..config import *
 from struct import pack, unpack
 
