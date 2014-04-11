@@ -15,6 +15,7 @@ def isShutdownReady():
     return shutdown
 
 def startShutdown():
+    global shutdown
     shutdown = True
 
 def safePrint(*x):
@@ -26,9 +27,9 @@ def safePrint(*x):
 
 def getCommandString(command, conf):
     data = MESSAGE_MAGIC_BYTES
-    commandStr = command.append('\x00' * (8 - len(command)))
-    data.append(commandStr)
+    commandStr = command.encode() + (b'\x00' * (8 - len(command)))
+    data += commandStr
     if command == 'ver':
-        data.append(pack('>I', len(VERSION)))
-        data.append(VERSION.encode())
+        data += pack('>I', len(VERSION))
+        data += VERSION.encode()
     return data
