@@ -5,6 +5,7 @@ import threading
 from ..constants import *
 from ..config import *
 from struct import pack, unpack
+import hashlib
 
 printLock = threading.Lock()
 responseMessages = []
@@ -25,11 +26,16 @@ def safePrint(*x):
     with printLock:
         print(s)
 
+def getVersionPayload(conf):
+    return VERSION.encode()
+
 def getCommandString(command, conf):
     data = MESSAGE_MAGIC_BYTES
     commandStr = command.encode() + (b'\x00' * (8 - len(command)))
     data += commandStr
+    payload = ''
     if command == 'ver':
-        data += pack('>I', len(VERSION))
-        data += VERSION.encode()
-    return data
+        payload = getVersionPayload(conf)
+    data += pack('>I', len(payload))
+    data += hashlib.sha512(payload).digest()[0:4]
+    return data + payload
