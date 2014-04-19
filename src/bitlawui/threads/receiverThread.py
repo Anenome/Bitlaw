@@ -54,7 +54,7 @@ class ReceiverThread(Thread):
             safePrint("Message did not begin with the necessary byte signature.  Not looking at this message.")
             self.data = ''
             return
-        command = self.data[4:12].decode()
+        command = self.data[4:12].decode().rstrip("\x00")
         payloadLength = unpack('>I', self.data[12:16])[0]
         safePrint("Payload is ", payloadLength, " bytes long.")
         payload = self.data[20: 20 + payloadLength]
@@ -66,7 +66,18 @@ class ReceiverThread(Thread):
             self.data = self.data[20 + payloadLength:]
             self.processData()
             return
-        if command == 'ver\x00\x00\x00\x00\x00':
+        if command == 'ver':
             self.recVersion(payload)
+        elif command == 'verack':
+            self.recVerack()
+
     def recVersion(self, payload):
+        payload = payload.decode()
         safePrint("Received version message.  Version =", payload)
+        if (payload == VERSION):
+            # do more complicated version matching later
+            with responseMessagesLock:
+                responseMessages.append(getCommandString('verack', self.config))
+
+    def recVerack(self):
+        safePrint("Received version acknowledgment.")

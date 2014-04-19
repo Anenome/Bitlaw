@@ -36,3 +36,11 @@ class SenderThread(Thread):
                 except Exception as err:
                     safePrint("Error while closing connection: ", err)
                 break
+            else:
+                msg = ''
+                with responseMessagesLock:
+                    if len(responseMessages) != 0:
+                        msg = responseMessages.pop(0)
+                        safePrint('msg = ', msg)
+                if msg != '':
+                    self.sock.sendall(msg)

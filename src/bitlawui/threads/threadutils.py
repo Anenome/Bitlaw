@@ -27,7 +27,7 @@ def safePrint(*x):
         print(s)
 
 def getVersionPayload(conf):
-    return VERSION.encode()
+    return VERSION
 
 def getCommandString(command, conf):
     data = MESSAGE_MAGIC_BYTES
@@ -36,6 +36,9 @@ def getCommandString(command, conf):
     payload = ''
     if command == 'ver':
         payload = getVersionPayload(conf)
-    data += pack('>I', len(payload))
-    data += hashlib.sha512(payload).digest()[0:4]
+    # 'verack' has no payload, yet
+    payload = payload.encode()
+    payloadLen = len(payload)
+    data += pack('>I', payloadLen)
+    data += hashlib.sha512(payload).digest()[0:4] # hash the empty string if necessary
     return data + payload
